@@ -1,3 +1,4 @@
+import os
 import time
 import logging
 from django.http import JsonResponse
@@ -15,6 +16,7 @@ def menu_views(request):
     if cached is not None:
         out = dict(cached)
         out['from_cache'] = True
+        out['server'] = os.environ.get('HOSTNAME', 'unknown')  # which container served this request
         return JsonResponse(out)
 
     # log request
@@ -27,6 +29,7 @@ def menu_views(request):
         'items': items,
         'served_at': now,
         'from_cache': False,
+        'server': os.environ.get('HOSTNAME', 'unknown'),  # which container served this request
     }
 
     # since redis is shared across workers, we can use the cache.set method to set the value in the cache
