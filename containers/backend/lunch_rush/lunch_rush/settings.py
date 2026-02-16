@@ -132,6 +132,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': REDIS_URL,
+        'KEY_PREFIX': 'lunch_rush',
         'OPTIONS': {
             'socket_connect_timeout': 5,
         },

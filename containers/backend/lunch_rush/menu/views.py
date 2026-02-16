@@ -13,7 +13,9 @@ def menu_views(request):
     # Try shared cache (Redis) first
     cached = cache.get(CACHE_KEY)
     if cached is not None:
-        return JsonResponse(cached)
+        out = dict(cached)
+        out['from_cache'] = True
+        return JsonResponse(out)
 
     # log request
     logger.info(f"Request received: {request.method} {request.path} from {request.META.get('REMOTE_ADDR')}")
@@ -24,9 +26,10 @@ def menu_views(request):
     response_data = {
         'items': items,
         'served_at': now,
+        'from_cache': False,
     }
 
-    #since redis is shared across workers, we can use the cache.set method to set the value in the cache
+    # since redis is shared across workers, we can use the cache.set method to set the value in the cache
     cache.set(CACHE_KEY, response_data, timeout=CACHE_TIME)
 
     return JsonResponse(response_data)
