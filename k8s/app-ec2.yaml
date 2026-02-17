@@ -1,0 +1,45 @@
+# Same as app.yaml but uses Docker Hub image (no build/import on EC2).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lunch-rush-app
+  labels:
+    app: lunch-rush-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: lunch-rush-app
+  template:
+    metadata:
+      labels:
+        app: lunch-rush-app
+    spec:
+      containers:
+        - name: app
+          image: marwansorour08212003/lunch_rush_app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: REDIS_URL
+              value: "redis://redis:6379/0"
+            - name: ALLOWED_HOSTS
+              value: "*"
+          resources:
+            requests:
+              memory: "128Mi"
+            limits:
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lunch-rush-app
+spec:
+  selector:
+    app: lunch-rush-app
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: LoadBalancer
